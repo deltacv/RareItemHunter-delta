@@ -113,17 +113,20 @@ public class RareItemHunterEntityListener implements Listener {
                     }
                 }
 
-                if (eAttacker instanceof Player) {
-                    Player pAttacker = (Player) eAttacker;
-
-                    pAttacker.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.YELLOW + bossAttacked.getName() + " HP: " + (int) iRemainingHP + "/" + bossAttacked.getMaxHP()));
-                }
-
-                leBossAttacked.setCustomName(String.format("%s %sHP / %sHP", new Object[]{
+                String tag = String.format(ChatColor.YELLOW + "" + ChatColor.BOLD + "%s" + ChatColor.RESET + " » " + ChatColor.RED + "" + ChatColor.BOLD + "%sHP / %sHP", new Object[]{
                         bossAttacked.getName(),
                         (int) iRemainingHP,
                         bossAttacked.getMaxHP()
-                }));
+                });
+
+                if (eAttacker instanceof Player) {
+                    Player pAttacker = (Player) eAttacker;
+
+                    pAttacker.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(tag));
+                }
+
+                leBossAttacked.setCustomName(tag);
+                leBossAttacked.setCustomNameVisible(true);
 
                 e.setDamage(1d);
             } else //Dead
@@ -134,14 +137,14 @@ public class RareItemHunterEntityListener implements Listener {
 
                     @Override
                     public void run() {
-                        if (count < 5) {
+                        if (count < 10) {
                             try {
                                 new FireworkVisualEffect().playFirework(
                                         leBossAttacked.getWorld(), leBossAttacked.getLocation(),
                                         FireworkEffect
                                                 .builder()
-                                                .with(FireworkEffect.Type.CREEPER)
-                                                .withColor(Color.RED)
+                                                .with(FireworkEffect.Type.BURST)
+                                                .withColor(Color.WHITE)
                                                 .build()
                                 );
                             } catch (Exception ex) {

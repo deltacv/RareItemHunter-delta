@@ -27,10 +27,12 @@ public class Slow extends ItemProperty
             le.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,60,1*level));
 
             p.sendMessage("Slowed!");
+            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_DROWNED_HURT, 0.3f, 2f);
 
             if(e.getEntity() instanceof Player)
             {
                 ((Player) e.getEntity()).sendMessage("You are slowed!");
+                ((Player) e.getEntity()).playSound(p.getLocation(), org.bukkit.Sound.ENTITY_DROWNED_HURT, 0.3f, 2f);
             } 
             
             return true;

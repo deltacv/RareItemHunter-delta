@@ -33,6 +33,7 @@ public class RepairItem extends ItemProperty
             isSlotOne.setDurability(sDurability);
             
             e.getPlayer().sendMessage("Item repaired by "+(level*20-10)+"%!");
+            e.getPlayer().playSound(e.getPlayer().getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1, 2);
             
             return true;
         }
@@ -64,6 +65,10 @@ public class RepairItem extends ItemProperty
                 isSlotOne.setDurability(sDurability);
 
                 e.getPlayer().sendMessage("Item in "+pClicked.getName()+"'s hand repaired!");
+                e.getPlayer().playSound(e.getPlayer().getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1, 2);
+
+                pClicked.sendMessage("Your item has been repaired by " + e.getPlayer().getName());
+                pClicked.playSound(pClicked.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1, 2);
 
                 return true;
             }

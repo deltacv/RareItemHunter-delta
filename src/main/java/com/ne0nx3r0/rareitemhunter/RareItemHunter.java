@@ -1,6 +1,7 @@
 package com.ne0nx3r0.rareitemhunter;
 
 import com.earth2me.essentials.Essentials;
+import com.ne0nx3r0.rareitemhunter.boss.Boss;
 import com.ne0nx3r0.rareitemhunter.boss.BossManager;
 import com.ne0nx3r0.rareitemhunter.command.RareItemHunterCommandExecutor;
 import com.ne0nx3r0.rareitemhunter.listener.*;
@@ -12,9 +13,15 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
+
+import io.github.arcaneplugins.levelledmobs.LevelledMobs;
+import io.github.arcaneplugins.levelledmobs.events.MobPostLevelEvent;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,6 +55,29 @@ public class RareItemHunter extends JavaPlugin
         loadConfig(false);
         
         this.essentials = ((Essentials) Bukkit.getPluginManager().getPlugin("Essentials"));
+
+        Plugin levelledMobs = Bukkit.getPluginManager().getPlugin("LevelledMobs");
+
+        if(levelledMobs != null)
+        {
+            this.getLogger().log(Level.INFO,"LevelledMobs found, enabling support...");
+
+            LevelledMobs lm = (LevelledMobs) levelledMobs;
+
+            getServer().getPluginManager().registerEvents(new Listener() {
+                @EventHandler
+                public void onMobLevel(MobPostLevelEvent e)
+                {
+                    Boss boss = bossManager.getBoss(e.getEntity());
+
+                    if(boss != null)
+                    {
+                        // Remove the boss from the level interface
+                        lm.getLevelInterface().removeLevel(e.getEntity());
+                    }
+                }
+            }, this);
+        }
         
         loadManagers();
         
@@ -61,6 +91,8 @@ public class RareItemHunter extends JavaPlugin
     public void reload()
     {
         getServer().getScheduler().cancelTasks(this);
+        // unregister all recipes
+        recipeManager.unregisterRecipes();
         
         loadConfig(true);
         

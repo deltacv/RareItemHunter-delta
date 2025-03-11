@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -52,9 +53,11 @@ public class Disarm extends ItemProperty
                 
                 pAttacked.getInventory().setItem(pAttacked.getInventory().getHeldItemSlot(), swapIn);
                 pAttacked.getInventory().setItem(iRandomSlot, swapOut);
+
+                p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
+                pAttacked.playSound(p.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
                 
                 p.sendMessage("Disarmed "+pAttacked.getName()+"!");
-                
                 pAttacked.sendMessage("You have been disarmed!");
 
                 return true;

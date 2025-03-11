@@ -640,7 +640,7 @@ public class RareItemHunterCommandExecutor implements CommandExecutor
             cs.sendMessage(sAllowedItems.substring(2));
             
             cs.sendMessage(ChatColor.GRAY+"Max level: "+ChatColor.WHITE+property.getMaxLevel());          
-            cs.sendMessage(ChatColor.GRAY+"Cost: "+ChatColor.WHITE+property.getCost(1));
+            cs.sendMessage(ChatColor.GRAY+"Cost: "+ChatColor.WHITE+property.getCost());
             
 /* TODO : figure out what's up with cost increments
             for(int i=1;i<=property.getMaxLevel();i++)

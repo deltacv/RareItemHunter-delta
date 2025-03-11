@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
@@ -25,7 +24,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 public class RecipeManager
 {
@@ -36,6 +34,8 @@ public class RecipeManager
     private final EnumMap<ItemPropertyTypes, List<Material>> TYPE_MATERIALS;
     private final ArrayList<Material> ALL_TYPE_MATERIALS;
     private final ItemStack DEFAULT_IS;
+
+    private final ArrayList<NamespacedKey> registeredRecipeKeys = new ArrayList<>();
 
     public RecipeManager(RareItemHunter plugin)
     {
@@ -66,6 +66,7 @@ public class RecipeManager
         compassRecipe.addIngredient(Material.DIAMOND);
 
         plugin.getServer().addRecipe(compassRecipe);
+        registeredRecipeKeys.add(compassKey);
 
         this.componentRecipes = new HashMap<>();
 
@@ -208,12 +209,14 @@ public class RecipeManager
         {
             for(int i = 1;i<9;i++)
             {
-                ShapelessRecipe recipe = new ShapelessRecipe(DEFAULT_IS);
+                NamespacedKey key = new NamespacedKey(plugin, "component_"+iMaterialId.name().toLowerCase()+"_"+i);
+                ShapelessRecipe recipe = new ShapelessRecipe(key, DEFAULT_IS);
 
                 recipe.addIngredient(iMaterialId);
                 recipe.addIngredient(i, Material.MAGMA_CREAM);
 
                 plugin.getServer().addRecipe(recipe);
+                registeredRecipeKeys.add(key);
             }
         }
 
@@ -385,6 +388,7 @@ public class RecipeManager
                     }
 
                     plugin.getServer().addRecipe(componentRecipe);
+                    registeredRecipeKeys.add(componentKey);
                     this.componentRecipes.put(componentRecipe.getResult(), ingredientsStorage);
                 }
             } catch (Exception ex) {
@@ -394,48 +398,11 @@ public class RecipeManager
         }
     }
 
-    /**
-     * Convert old material name and data value to new material
-     * @param oldMaterial The old material name
-     * @param data The data value
-     * @return The new Material equivalent
-     */
-    private Material convertOldMaterialWithData(String oldMaterial, short data) {
-        try {
-            // Try direct conversion first
-            Material material = Material.valueOf(oldMaterial);
-
-            // Handle special cases based on data values
-            if (material == Material.LEGACY_WOOL && data > 0) {
-                // Convert colored wool
-                switch(data) {
-                    case 1: return Material.ORANGE_WOOL;
-                    case 2: return Material.MAGENTA_WOOL;
-                    case 3: return Material.LIGHT_BLUE_WOOL;
-                    case 4: return Material.YELLOW_WOOL;
-                    case 5: return Material.LIME_WOOL;
-                    case 6: return Material.PINK_WOOL;
-                    case 7: return Material.GRAY_WOOL;
-                    case 8: return Material.LIGHT_GRAY_WOOL;
-                    case 9: return Material.CYAN_WOOL;
-                    case 10: return Material.PURPLE_WOOL;
-                    case 11: return Material.BLUE_WOOL;
-                    case 12: return Material.BROWN_WOOL;
-                    case 13: return Material.GREEN_WOOL;
-                    case 14: return Material.RED_WOOL;
-                    case 15: return Material.BLACK_WOOL;
-                    default: return Material.WHITE_WOOL;
-                }
-            }
-
-            // Add more special cases for other materials as needed
-
-            return material;
-        } catch (IllegalArgumentException e) {
-            // Legacy material conversion
-            // This would need more complete mapping based on your needs
-            plugin.getLogger().warning("Could not convert legacy material: " + oldMaterial + ":" + data);
-            return Material.STONE;
+    public void unregisterRecipes()
+    {
+        for(NamespacedKey key : this.registeredRecipeKeys)
+        {
+            plugin.getServer().removeRecipe(key);
         }
     }
 
@@ -634,6 +601,11 @@ public class RecipeManager
 
     public boolean isCompassItem(ItemStack is)
     {
+        if(is == null)
+        {
+            return false;
+        }
+
         return is.isSimilar(this.compass);
     }
 

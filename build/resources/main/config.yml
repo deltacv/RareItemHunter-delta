@@ -20,6 +20,9 @@ maxChanceToGenerateBossEgg: 20
 # How many minutes before a boss that is not found will disappear
 bossEggExpiration: 30
 
+# Whether boss eggs persist through server restarts
+despawnEggOnLoad: true
+
 # food, xp, or money (money requires Vault)
 costType: food
 
@@ -41,6 +44,9 @@ costMultiplier: 1
 
 # Number of player kills before a boss will disappear
 bossExpireKills: 20
+
+# Time before a boss will disappear after being spawned, in seconds
+bossExpireTime: 900
 
 # Misc
 

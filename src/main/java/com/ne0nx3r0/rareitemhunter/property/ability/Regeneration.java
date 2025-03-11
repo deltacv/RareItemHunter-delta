@@ -2,6 +2,7 @@ package com.ne0nx3r0.rareitemhunter.property.ability;
 
 import com.ne0nx3r0.rareitemhunter.property.ItemPropertyRepeatingEffect;
 import com.ne0nx3r0.rareitemhunter.property.ItemPropertyTypes;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class Regeneration extends ItemPropertyRepeatingEffect
@@ -24,6 +25,8 @@ public class Regeneration extends ItemPropertyRepeatingEffect
             {
                 iNewHP = 20;
             }
+
+            p.playSound(p.getLocation(), Sound.ENTITY_GENERIC_DRINK, 0.5f, 1.3f);
             
             p.setHealth(iNewHP);
         }

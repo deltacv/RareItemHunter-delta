@@ -44,11 +44,13 @@ public class VampiricRegeneration extends ItemProperty
             attacker.setHealth(iNewAttackerHP);
             
             p.sendMessage(ChatColor.RED+"You stole "+iStolenHP+"HP!");
+            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_GENERIC_DRINK, 0.5f, 1.3f);
             
             if(attacked instanceof Player)
             {
                 Player pAttacked = (Player) attacked;
                 pAttacked.sendMessage(ChatColor.RED+p.getName()+" stole "+iStolenHP+"HP from you!");
+                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_GENERIC_DRINK, 0.5f, 1.3f);
             }
             
             return true;

@@ -52,6 +52,8 @@ public class PaintWool extends ItemProperty
                     // Change the block to the next wool color
                     clickedBlock.setType(WOOL_COLORS[nextColorIndex], true);
 
+                    e.getPlayer().playSound(e.getPlayer().getLocation(), "block.wool.place", 1.0F, 1.0F);
+
                     // Return true to indicate the interaction was successful
                     return true;
                 }

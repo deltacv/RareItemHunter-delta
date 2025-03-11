@@ -70,11 +70,24 @@ public class saveFileManager
                 }
                 else
                 {
-                    bm.bossEggs.add(new BossEgg(
+                    BossEgg egg = (new BossEgg(
                         tempEgg.get("boss").toString(),
                         lEgg,
                         tempEgg.get("autospawn").toString().equalsIgnoreCase("true")
                     ));
+
+                    bm.bossEggs.add(egg);
+
+                    if(plugin.getConfig().getBoolean("despawnEggOnLoad", true)) {
+                        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                            @Override
+                            public void run() {
+                                bm.removeBossEgg(egg); // lol
+                                plugin.getLogger().log(Level.INFO, "Removing boss egg at {0},{1},{2} on load",
+                                        new Object[]{lEgg.getBlockX(), lEgg.getBlockY(), lEgg.getBlockZ()});
+                            }
+                        }, 100);
+                    }
                     
                     lEgg.getBlock().setMetadata("isBossEgg", new FixedMetadataValue(plugin,true));
                 }

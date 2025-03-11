@@ -36,7 +36,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class PropertyManager
 {
-    private final RareItemHunter plugin;
+    public final RareItemHunter plugin;
     private final EnumMap<ItemPropertyTypes, String> TYPE_PREFIXES;
     private final Map<String,ItemProperty> properties;
     private final Map<String,Map<ItemProperty,Integer>> activePlayerEffects;
@@ -135,8 +135,8 @@ public class PropertyManager
     {               
         if(!yml.isSet(icp.getName()))
         {
-            //TODO: wtf was going on here with getCost requiring a level?
-            yml.set(icp.getName(), icp.getCost(1));
+            // wtf was going on here with getCost requiring a level?
+            yml.set(icp.getName(), icp.getCost());
         }
         
         int iCost = yml.getInt(icp.getName());
@@ -144,6 +144,21 @@ public class PropertyManager
         if(iCost == -1)
         {
             return;
+        }
+
+        plugin.getLogger().log(Level.INFO,"Loaded property: "+icp.getName()+" with cost: "+iCost);
+
+        if(iCost < 0)
+        {
+            iCost = 0;
+
+            plugin.getLogger().log(Level.INFO,"Property "+icp.getName()+" had a negative cost, setting to 0");
+        }
+        if(iCost > 10)
+        {
+            iCost = 10;
+
+            plugin.getLogger().log(Level.INFO,"Property "+icp.getName()+" had a cost greater than 10, setting to 10");
         }
         
         icp.setCost(iCost);
@@ -269,7 +284,7 @@ public class PropertyManager
                             levelIncrement = level / levelIncrement;
                         }
 
-                        int cost = (property.getCost(level) - levelIncrement) * plugin.COST_MULTIPLIER;
+                        int cost = (property.getCost() - levelIncrement) * plugin.COST_MULTIPLIER;
                         
                         boolean hasCost = this.hasCost(player, cost);
 
@@ -409,14 +424,52 @@ public class PropertyManager
         }
         return false;
     }
+
+    public int calculateCost(ItemProperty property, int level)
+    {
+        int levelIncrement = plugin.COST_LEVEL_INCREMENT;
+
+        if(levelIncrement > 1)
+        {
+            levelIncrement = level / levelIncrement;
+        }
+
+        return (property.getCost() - levelIncrement) * plugin.COST_MULTIPLIER;
+    }
+
+    public int calculateCostNoMultiplier(ItemProperty property, int level)
+    {
+        int levelIncrement = plugin.COST_LEVEL_INCREMENT;
+
+        if(levelIncrement > 1)
+        {
+            levelIncrement = level * levelIncrement;
+        }
+
+        return (property.getCost() + levelIncrement);
+    }
+
+    public int calculateCostNoMultiplierLevelDecrements(ItemProperty property, int level)
+    {
+        int levelIncrement = plugin.COST_LEVEL_INCREMENT;
+
+        if(levelIncrement > 1)
+        {
+            levelIncrement = level * levelIncrement;
+        }
+
+        return (property.getCost() - levelIncrement);
+    }
     
     public void takeCost(Player player, int cost)
-    {   
+    {
         if(plugin.COST_TYPE == ItemPropertyCostTypes.FOOD)
         {
             if(player.getFoodLevel() >= cost)
             {
                 player.setFoodLevel(player.getFoodLevel() - cost);
+            } else {
+                player.setFoodLevel(1);
             }
         }        
         else if(plugin.COST_TYPE == ItemPropertyCostTypes.XP)
@@ -424,6 +477,8 @@ public class PropertyManager
             if(player.getTotalExperience() >= cost)
             {
                 player.setTotalExperience(player.getTotalExperience() - cost);
+            } else {
+                player.setTotalExperience(0);
             }
         }        
         else if(plugin.COST_TYPE == ItemPropertyCostTypes.MONEY)
@@ -431,6 +486,8 @@ public class PropertyManager
             if(plugin.economy.has(player.getName(), cost))
             {
                 plugin.economy.withdrawPlayer(player.getName(), cost);
+            } else {
+                plugin.economy.withdrawPlayer(player.getName(), plugin.economy.getBalance(player.getName()));
             }
         }
     }

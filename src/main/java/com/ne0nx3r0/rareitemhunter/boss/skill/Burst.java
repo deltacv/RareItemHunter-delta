@@ -37,11 +37,20 @@ public class Burst extends BossSkill
                 Logger.getLogger(Boss.class.getName()).log(Level.SEVERE, null, ex);
             }
 */
-            Vector unitVector = eAttacker.getLocation().toVector().subtract(le.getLocation().toVector()).normalize();
+            Vector unitVector = eAttacker.getLocation().toVector().subtract(le.getLocation().toVector());
 
-            unitVector.setY(0.55/level);
+            if (unitVector.lengthSquared() == 0) {
+                unitVector = new Vector(0, 1, 0); // Evita NaN, empuja hacia arriba.
+            } else {
+                unitVector.normalize();
+            }
+
+            unitVector.setY(0.55 / Math.max(level, 1)); // Evita división por cero.
 
             le.setVelocity(unitVector.multiply(2 * level));
+
+            // play effect
+            e.getEntity().getWorld().createExplosion(e.getEntity().getLocation(), 0.0F);
 
             return true;
         }

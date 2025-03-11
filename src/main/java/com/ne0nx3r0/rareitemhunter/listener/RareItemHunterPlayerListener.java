@@ -6,6 +6,9 @@ import com.ne0nx3r0.rareitemhunter.boss.Boss;
 import com.ne0nx3r0.util.FireworkVisualEffect;
 import java.util.List;
 import java.util.logging.Level;
+
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -26,10 +29,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -43,6 +43,17 @@ public class RareItemHunterPlayerListener implements Listener
     public RareItemHunterPlayerListener(RareItemHunter plugin)
     {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onHold(PlayerItemHeldEvent e)
+    {
+        ItemStack is = e.getPlayer().getInventory().getItem(e.getNewSlot());
+
+        if(plugin.recipeManager.isCompassItem(is))
+        {
+            e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.DARK_GREEN+"The compass vibrates. Tap on the ground to attune it."));
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -87,8 +98,9 @@ public class RareItemHunterPlayerListener implements Listener
                 }
                 else if(e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
                         e.getPlayer().setCompassTarget(e.getPlayer().getWorld().getSpawnLocation());
-                        
-                        e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"Your compass was reset. Tap on the ground to attune it to a legendary boss egg.");
+
+                        e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.DARK_GREEN+"Your compass was reset and points nowhere."));
+                        //e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"Your compass was reset. Tap on the ground to attune it to a legendary boss egg.");
                 }
                 else
                 {
@@ -96,26 +108,35 @@ public class RareItemHunterPlayerListener implements Listener
 
                     if(lBossEgg != null)
                     {
-                        e.getPlayer().setCompassTarget(lBossEgg);
 
-                        if(Math.random() < 0.5) {
-                            e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"The compass glows, then points sharply");
+                        if(Math.random() > 0.4) {
+                            e.getPlayer().setCompassTarget(lBossEgg);
+
+                            if(Math.random() > 0.4) {
+                                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.DARK_GREEN+"The compass glows, then points sharply"));
+                                // e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"The compass glows, then points sharply");
+                            } else {
+                                // calculate distance
+                                double dX = lBossEgg.getBlockX() - e.getPlayer().getLocation().getBlockX();
+                                double dZ = lBossEgg.getBlockZ() - e.getPlayer().getLocation().getBlockZ();
+
+                                int randomError = (int) (Math.random() * 5);
+                                double distance = Math.sqrt(dX*dX + dZ*dZ) + randomError;
+
+                                // e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"The compass glows, then points sharply, somewhere "+(int)distance+"m away.");
+                                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.DARK_GREEN+"The compass glows, then points "+(int)distance+"m away."));
+                            }
                         } else {
-                            // calculate distance
-                            double dX = lBossEgg.getBlockX() - e.getPlayer().getLocation().getBlockX();
-                            double dZ = lBossEgg.getBlockZ() - e.getPlayer().getLocation().getBlockZ();
-
-                            int randomError = (int) (Math.random() * 10);
-                            double distance = Math.sqrt(dX*dX + dZ*dZ) + randomError;
-
-                            e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"The compass glows, then points sharply, somewhere "+(int)distance+"m away");
-
+                            e.getPlayer().setCompassTarget(e.getPlayer().getWorld().getSpawnLocation());
+                            // e.getPlayer().sendMessage(ChatColor.DARK_GREEN+"The compass hears the call, but it needs another chance to attune...");
+                            e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.DARK_GREEN+"The compass hears the call, but it needs another try.."));
                         }
                     }
                     else {
                         e.getPlayer().setCompassTarget(e.getPlayer().getWorld().getSpawnLocation());
                         
-                        e.getPlayer().sendMessage(ChatColor.DARK_GRAY+"The compass glows for a moment, then fades...");
+                        // e.getPlayer().sendMessage(ChatColor.DARK_GRAY+"The compass glows for a moment, then fades...");
+                        e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.DARK_GRAY+"The compass glows for a moment, then fades..."));
                     }
                 }
                 
@@ -181,7 +202,6 @@ public class RareItemHunterPlayerListener implements Listener
                     }
                     catch (Exception ex)
                     {
-                        plugin.getLogger().log(Level.SEVERE, null, ex);
                     }
 
                     plugin.bossManager.destroyBoss(eAttacker,bossAttacker);

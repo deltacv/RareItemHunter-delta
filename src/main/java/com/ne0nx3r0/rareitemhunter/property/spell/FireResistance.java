@@ -23,6 +23,7 @@ public class FireResistance extends ItemProperty
         e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,20*60,20*level));
         
         e.getPlayer().sendMessage("Upped your fire resistance!");
+
         
         return true;
     }

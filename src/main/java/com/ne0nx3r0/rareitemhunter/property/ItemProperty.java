@@ -62,7 +62,7 @@ public class ItemProperty
     }
     
     //Can be overwritten for level-based costs
-    public int getCost(int level)
+    public int getCost()
     {
         return this.cost;
     }

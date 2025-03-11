@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.UUID;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -13,6 +14,7 @@ public class Boss
     private int kills = 0;
     BossTemplate template;
     UUID entityId;
+    LivingEntity entity;
     
     Boss(BossTemplate bossTemplate)
     {
@@ -109,6 +111,7 @@ public class Boss
     void setEntity(Entity entity)
     {
         this.entityId = entity.getUniqueId();
+        this.entity = (LivingEntity) entity;
     }
 
     public int getKills()

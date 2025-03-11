@@ -3,6 +3,7 @@ package com.ne0nx3r0.rareitemhunter.boss;
 import com.ne0nx3r0.rareitemhunter.RareItemHunter;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class BossAutoSpawner implements Runnable{
@@ -44,6 +45,9 @@ public class BossAutoSpawner implements Runnable{
 
                                     for(Player p : eggToHatch.getLocation().getWorld().getPlayers())
                                     {
+                                        //play lightning strike sound
+                                        p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 1.0f, 1.0f);
+
                                         p.sendMessage(ChatColor.DARK_GREEN+"Legendary boss "+ChatColor.WHITE+eggToHatch.getName()+ChatColor.DARK_GREEN+" has been awakened by "+ChatColor.WHITE+awakener+ChatColor.DARK_GREEN+"!");
                                     }
 

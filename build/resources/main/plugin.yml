@@ -3,7 +3,7 @@ main: com.ne0nx3r0.rareitemhunter.RareItemHunter
 author: Sebastian Erives
 version: '1.4.8-A'
 database: false
-softdepend: [RemoteEntities]
+softdepend: [RemoteEntities,LevelledMobs]
 description: Rare Item Hunter
 api-version: 1.13
 commands:

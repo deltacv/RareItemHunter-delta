@@ -30,17 +30,15 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+
+import com.ne0nx3r0.util.FireworkVisualEffect;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -247,40 +245,14 @@ public class BossManager
                     }
                 }  
             }
-            
+
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new BossAutoSpawner(plugin, this, 0), 0, 20);
+
 // Save the template
             this.bossTemplates.put(bossTemplate.name.toLowerCase(),bossTemplate);
         }
        
         this.saveManager = new saveFileManager(plugin,this);
-        
-// Schedule random boss spawns
-
-        int iTimer = 60 * 20 * plugin.getConfig().getInt("timeBetweenChancesToGenerateBossEgg",60 * 60 * 20);
-        int iMaxChance = plugin.getConfig().getInt("maxChanceToGenerateBossEgg",20);
-        int iExpiration = 60 * 20 * plugin.getConfig().getInt("bossEggExpiration",15 * 60 * 20);
-        
-        if(iTimer > 0)
-        {
-            plugin.getServer().getScheduler().scheduleSyncRepeatingTask(
-                plugin,
-                new RandomlyGenerateBossTask(plugin,iMaxChance,iTimer,iExpiration), 
-                iTimer, 
-                iTimer);
-        }
-        
-// Setup autospawner
-        int autospawnTicks = plugin.getConfig().getInt("autospawnTicks");
-        
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(
-            plugin,
-            new BossAutoSpawner(
-                    plugin,
-                    this,
-                    plugin.getConfig().getDouble("autospawnDistance")
-            ), 
-            autospawnTicks, 
-            autospawnTicks);
     }
     
     public boolean isBoss(UUID id)
@@ -328,6 +300,30 @@ public class BossManager
         this.removeBossEgg(egg);
         
         Boss boss = this.spawnBoss(egg.getName(), egg.getLocation());
+
+        // despawn boss after 15 minutes
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            Entity e = Bukkit.getServer().getEntity(boss.entityId);
+            destroyBoss(e, boss);
+
+            for(Player p : plugin.getServer().getOnlinePlayers()) {
+                // firework
+                try {
+                    new FireworkVisualEffect().playFirework(
+                            e.getWorld(), e.getLocation(),
+                            FireworkEffect
+                                    .builder()
+                                    .with(FireworkEffect.Type.BURST)
+                                    .withColor(Color.WHITE)
+                                    .build()
+                    );
+                } catch (Exception ex) {
+                }
+
+                p.sendMessage(ChatColor.GREEN+"Legendary boss "+ boss.getName()
+                        + " was unable to keep its form for long and has left this world.");
+            }
+        }, 20L * plugin.getConfig().getInt("bossExpireTime", 15 * 60));
         
         return boss;
     }
@@ -344,13 +340,22 @@ public class BossManager
     public Boss spawnBoss(String sBossName, Location eggLocation)
     {
         Boss boss = new Boss(this.bossTemplates.get(sBossName.toLowerCase()));
+
+        // play lightning bolt effect
+        eggLocation.getWorld().strikeLightningEffect(eggLocation);
         
         Entity ent = eggLocation.getWorld().spawnEntity(eggLocation, boss.getEntityType());
       
         boss.setEntity(ent);
         
         LivingEntity lent = (LivingEntity) ent;
-        
+
+        lent.setGlowing(true);
+
+        if(lent instanceof Zombie) {
+            ((Zombie) lent).setConversionTime(Integer.MAX_VALUE);
+        }
+
         lent.setCustomNameVisible(true);
         lent.setRemoveWhenFarAway(false);
         
@@ -360,7 +365,25 @@ public class BossManager
             
         if(boss.template.equipment != null)
         {
-            lequips.setArmorContents(boss.template.equipment.toArray(new ItemStack[4]));
+            if(boss.template.equipment.size() > 0)
+            {
+                lequips.setHelmet(boss.template.equipment.get(0));
+            }
+
+            if(boss.template.equipment.size() > 1)
+            {
+                lequips.setChestplate(boss.template.equipment.get(1));
+            }
+
+            if(boss.template.equipment.size() > 2)
+            {
+                lequips.setLeggings(boss.template.equipment.get(2));
+            }
+
+            if(boss.template.equipment.size() > 3)
+            {
+                lequips.setBoots(boss.template.equipment.get(3));
+            }
 
             lequips.setBootsDropChance(0f);
             lequips.setLeggingsDropChance(0f);
@@ -503,6 +526,18 @@ public class BossManager
         );
 
         this.bossEggs.add(newEgg);
+
+        // destroy after half an hour
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                removeBossEgg(newEgg);
+
+                for(Player p : plugin.getServer().getOnlinePlayers()) {
+                    p.sendMessage(ChatColor.GRAY + "A legendary boss egg has vanished...");
+                }
+            }
+        }, (60 * 20) * plugin.getConfig().getInt("bossEggExpiration", 30));
 
         this.saveManager.save();
 

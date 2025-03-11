@@ -41,6 +41,8 @@ public class GrowTree extends ItemProperty
                 // Generate the tree
                 clickedBlock.getWorld().generateTree(clickedBlock.getLocation(), treeType);
 
+                clickedBlock.getWorld().playSound(clickedBlock.getLocation(), org.bukkit.Sound.BLOCK_GRASS_PLACE, 1, 2f);
+
                 return true;
             }
         }

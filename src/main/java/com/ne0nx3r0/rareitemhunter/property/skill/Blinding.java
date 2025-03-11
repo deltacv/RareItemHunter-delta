@@ -27,10 +27,12 @@ public class Blinding extends ItemProperty
             le.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,60*level,1));
             
             p.sendMessage("Blinded!");
+            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_BLAZE_HURT, 1, 2);
 
             if(e.getEntity() instanceof Player)
             {
                 ((Player) e.getEntity()).sendMessage("You are blinded!");
+                ((Player) e.getEntity()).playSound(p.getLocation(), org.bukkit.Sound.ENTITY_BLAZE_HURT, 1, 2);
             }
             
             return true;

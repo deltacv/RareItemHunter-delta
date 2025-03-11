@@ -24,7 +24,7 @@ public class Disarm extends BossSkill
 
             if(pAttacker.getItemInHand() != null)
             {
-                int iRandomSlot = (new Random()).nextInt(44)+9;
+                int iRandomSlot = ((int) (Math.random() * 10)) - 1;
 
                 ItemStack swapOut = pAttacker.getInventory().getItem(pAttacker.getInventory().getHeldItemSlot());
                 ItemStack swapIn = pAttacker.getInventory().getItem(iRandomSlot);
