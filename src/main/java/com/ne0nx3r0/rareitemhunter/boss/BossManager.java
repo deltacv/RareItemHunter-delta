@@ -171,19 +171,25 @@ public class BossManager
                 List<String> skillStrings = (List<String>) bossesYml.getList(sBossName+".skills");
 
                 for(String skillString : skillStrings)
-                {           
-                    String[] skillValues = skillString.split(" ");
+                {
+                    try {
+                        String[] skillValues = skillString.split(" ");
 
-                    String skillName = skillValues[2];
-                    int chance = Integer.parseInt(skillValues[0].substring(0,skillString.indexOf("%")));
-                    int level = Integer.parseInt(skillValues[4]);
+                        String skillName = skillValues[2];
+                        int chance = Integer.parseInt(skillValues[0].substring(0, skillString.indexOf("%")));
+                        int level = Integer.parseInt(skillValues[4]);
 
-                    for(BossSkill bossSkill : availableBossSkills)
-                    {
-                        if(bossSkill.getYmlName().equalsIgnoreCase(skillName))
-                        {
-                            bossTemplate.addSkill(bossSkill, level, chance);
+                        for (BossSkill bossSkill : availableBossSkills) {
+                            if (bossSkill.getYmlName().equalsIgnoreCase(skillName)) {
+                                bossTemplate.addSkill(bossSkill, level, chance);
+                            }
                         }
+                    } catch (Exception e) {
+                        plugin.getLogger().log(Level.WARNING,
+                                "''{0}'' is not a valid skill on boss ''{1}''. Skipping.",
+                                new Object[]{skillString, sBossName});
+
+                        plugin.getLogger().log(Level.WARNING, "", e);
                     }
                 }  
             }

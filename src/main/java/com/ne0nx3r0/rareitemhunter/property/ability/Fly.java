@@ -64,6 +64,8 @@ public class Fly extends ItemPropertyRepeatingEffect {
 
             if (p.isFlying()) {
                 if (wasFlying.getOrDefault(p, false) != p.isFlying() && p.isFlying()) {
+                    this.propertyManager.takeCost(p, (int) (cost * 0.8));
+
                     for (int i = 0; i < 8; i++) {
                         Location location = p.getLocation().clone();
 

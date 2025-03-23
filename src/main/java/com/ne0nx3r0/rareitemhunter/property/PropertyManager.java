@@ -106,6 +106,7 @@ public class PropertyManager
         this.addProperty(propertyCostsYml,new GreaterBurst(fireworks));
         this.addProperty(propertyCostsYml,new GrowTree());
         this.addProperty(propertyCostsYml,new Haste());
+        this.addProperty(propertyCostsYml,new Homesetter());
         this.addProperty(propertyCostsYml,new Invisibility());
         this.addProperty(propertyCostsYml,new MagicBag());
         this.addProperty(propertyCostsYml,new RepairItem());
