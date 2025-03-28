@@ -3,10 +3,7 @@ package com.ne0nx3r0.rareitemhunter.property.spell;
 import com.ne0nx3r0.rareitemhunter.RareItemHunter;
 import com.ne0nx3r0.rareitemhunter.property.ItemProperty;
 import com.ne0nx3r0.rareitemhunter.property.ItemPropertyTypes;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -68,6 +65,15 @@ public class Homesetter extends ItemProperty
                     e.getPlayer().teleport(loc);
 
                     e.getPlayer().sendMessage(ChatColor.YELLOW + "Teleporting to saved location!");
+
+                    Bukkit.getScheduler().runTaskLater(RareItemHunter.self, () -> {
+                        e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_PLAYER_TELEPORT, 1, 0.5f);
+
+                        if(Math.random() >= 0.8) {
+                            // spawn endermite
+                            e.getPlayer().getWorld().spawnEntity(e.getPlayer().getLocation(), EntityType.ENDERMITE);
+                        }
+                    }, 3L);
                 } catch (Exception ex) {
                     e.getPlayer().sendMessage(ChatColor.RED + "Invalid location saved!");
                     RareItemHunter.self.getLogger().log(Level.WARNING, "Invalid location saved in item meta: " + lore.get(2), ex);

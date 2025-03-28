@@ -16,7 +16,7 @@ public class CatsFeet extends ItemProperty
     private final PropertyManager propertyManager;
     public CatsFeet(PropertyManager propertyManager)
     {
-        super(ItemPropertyTypes.SPELL,"Cat's Feet","Lets you or a clicked target jump much higher for 60 seconds / lvl",8,4);
+        super(ItemPropertyTypes.SPELL,"Cats Feet","Lets you or a clicked target jump much higher for 60 seconds / lvl",8,4);
         
         this.propertyManager = propertyManager;
     }

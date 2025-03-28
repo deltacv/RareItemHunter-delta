@@ -147,8 +147,6 @@ public class PropertyManager
             return;
         }
 
-        plugin.getLogger().log(Level.INFO,"Loaded property: "+icp.getName()+" with cost: "+iCost);
-
         if(iCost < 0)
         {
             iCost = 0;
@@ -271,8 +269,7 @@ public class PropertyManager
                     {
                         level = RomanNumeral.valueOf(sLevel);
                         sPropertyString = sPropertyString.substring(0,sPropertyString.lastIndexOf(" "));
-                    }
-                    catch(Exception ex){}
+                    } catch(Exception ex){}
 
                     ItemProperty property = this.properties.get(sPropertyString.toLowerCase());
                     
